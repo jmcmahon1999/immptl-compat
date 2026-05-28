@@ -1,0 +1,14 @@
+{
+  "required": false,
+  "package": "com.jmcmoon.immptl_compat.mixin.ae2",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MixinDimensionIntId"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

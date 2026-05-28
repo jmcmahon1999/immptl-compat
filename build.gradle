@@ -106,6 +106,7 @@ dependencies {
 
     implementation "maven.modrinth:immersive-portals-neoforge:${immptl_version}"
     implementation "maven.modrinth:cloth-config:${cloth_config_version}+neoforge"
+    compileOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}"
 
 }
 
