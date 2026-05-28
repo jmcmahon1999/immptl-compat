@@ -108,6 +108,13 @@ dependencies {
     implementation "maven.modrinth:cloth-config:${cloth_config_version}+neoforge"
     compileOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}"
 
+    compileOnly "mekanism:Mekanism:${minecraft_version}-${mekanism_version}"
+
+    runtimeOnly "mekanism:Mekanism:${minecraft_version}-${mekanism_version}"
+    runtimeOnly "mekanism:Mekanism:${minecraft_version}-${mekanism_version}:additions"
+    runtimeOnly "mekanism:Mekanism:${minecraft_version}-${mekanism_version}:generators"
+    runtimeOnly "mekanism:Mekanism:${minecraft_version}-${mekanism_version}:tools"
+
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

@@ -1,0 +1,14 @@
+{
+  "required": false,
+  "package": "com.jmcmoon.immptl_compat.mixin.mekanism",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MixinPacketUtils"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
