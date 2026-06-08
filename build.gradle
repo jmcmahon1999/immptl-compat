@@ -14,7 +14,15 @@ tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
 
-version = mod_version
+def isSnapshotPublish = gradle.startParameter.taskNames.any {
+    it.toLowerCase().contains("snapshot")
+}
+
+version = "${mod_version}-${minecraft_version}"
+
+if (isSnapshotPublish && !version.toString().endsWith("-SNAPSHOT")) {
+    version = "${version}-SNAPSHOT"
+}
 group = mod_group_id
 
 repositories {
@@ -140,6 +148,24 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 sourceSets.main.resources.srcDir generateModMetadata
 neoForge.ideSyncTask generateModMetadata
 
+def loadEnv() {
+    def envFile = rootProject.file(".env")
+    if (!envFile.exists()) return [:]
+
+    envFile.readLines()
+            .findAll { it && !it.trim().startsWith("#") && it.contains("=") }
+            .collectEntries { line ->
+                def parts = line.split("=", 2)
+                [(parts[0].trim()): parts[1].trim()]
+            }
+}
+
+def env = loadEnv()
+def maven_username = System.getenv("MAVEN_USERNAME")
+        ?: env["MAVEN_USERNAME"]
+def maven_password = System.getenv("MAVEN_SECRET")
+        ?: env["MAVEN_SECRET"]
+
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
@@ -148,7 +174,20 @@ publishing {
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/repo"
+            name = "jmcmoonMaven"
+            url = "https://maven.jmcmoon.com/releases"
+            credentials {
+                username = maven_username
+                password = maven_password
+            }
+        }
+        maven {
+            name = "jmcmoonMavenSnapshot"
+            url = "https://maven.jmcmoon.com/snapshots"
+            credentials {
+                username = maven_username
+                password = maven_password
+            }
         }
     }
 }

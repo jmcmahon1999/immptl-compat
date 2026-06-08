@@ -7,7 +7,7 @@ on:
       - master
 
 jobs:
-  version:
+  build-version:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.convver-version.outputs.tag }}
@@ -50,13 +50,13 @@ jobs:
         run: git push --follow-tags
 
       - name: Setup JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
@@ -72,11 +72,11 @@ jobs:
           path: ./build/libs/*
 
   release:
-    needs: [ version ]
+    needs: [ build-version ]
     runs-on: ubuntu-latest
-    if: ${{ needs.version.outputs.tag != needs.version.outputs.prevTag }}
+    if: ${{ needs.build-version.outputs.tag != needs.build-version.outputs.prevTag }}
     env:
-      TAG: ${{ needs.version.outputs.tag }}
+      TAG: ${{ needs.build-version.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -98,3 +98,26 @@ jobs:
             --generate-notes \
             --fail-on-no-commits \
             --verify-tag
+
+  publish:
+    needs: [ release ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Publish package
+        run: ./gradlew publishAllPublicationsToJmcmoonMavenRepository
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_SECRET: ${{ secrets.MAVEN_SECRET }}
